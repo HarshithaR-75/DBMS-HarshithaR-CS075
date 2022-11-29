@@ -43,12 +43,26 @@ having count(customername) > (select count(branchname)
                                       from branch
                                       where branchcity="Delhi");
                                       
- select customername from borrower
- where customername NOT IN(select customername 
-						   from depositor);
+
+
+
+select customername from borrower
+where customername NOT IN(select customername from depositor);
                            
                            
-                           
+ 
+select customername
+from borrower 
+where loannumber = any(select loannumber 
+                       from loan 
+                        where branchname= any(select branchname
+                                               from branch 
+                                                where branchcity="Bangalore")) and customername in (select customername from depositor 
+                                                                                                     where customername=any(select customername 
+															    from bankcustomer 
+															    where city="Bangalore")); 
+																						                                    bankcustomer where city="Bangalore"));
+
                    
 select branchname 
 from branch
@@ -56,11 +70,16 @@ where assets>(select max(assets)
 	           from branch 
                where branchcity="Bangalore");
                
+
+
 delete from bankaccount
 where branchname in(select branchname
 			        from  branch
                     where branchcity="bombay");
                
+
+
+
 update bankaccount
 set balance= balance+0.05*balance;
                                       
