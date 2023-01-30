@@ -20,6 +20,11 @@ foreign key(sid) references suppliers(sid),
 foreign key(pid) references parts(pid), 
 primary key(sid, pid));
 
+desc suppliers;
+desc parts;
+desc catalog;
+
+
 insert into suppliers values(10001, "Acme Widget","Bangalore");
 insert into suppliers values(10002,"Johns","Kolkata");
 insert into suppliers values(10003, "Vimal","Mumbai");
@@ -43,7 +48,9 @@ insert into catalog values(10003, 20003,30);
 insert into catalog values(10004, 20003,40);
 
 select * from suppliers;
+
 select * from parts;
+
 select * from catalog;
 
 select distinct(pname) 
@@ -52,32 +59,32 @@ where p.pid=c.pid;
 
 select s.sname 
 from suppliers s
-where ((Select count(p.pid)
-        from parts p)=
-        (Select count(c.pid)
-        from catalog c
-        where c.sid= s.sid));
+where ((select count(p.pid) from parts p)=(select count(c.pid) from catalog c where c.sid = s.sid));
 
  select distinct(sname) 
  from suppliers s, parts p, catalog c
  where s.sid =c.sid and c.pid=p.pid and 
  p.color="Red";
  
- select pname
- from parts 
- where pid IN (select pid 
-               from catalog
-               where sid= (select sid 
-                           from suppliers 
-                           where sname="Acme Widget") and NOT EXISTS (Select pid 
-																	  from catalog
-                                                                      where sid NOT IN (Select sid
-                                                                                        from suppliers 
-                                                                                        where sname="
- 
- 
- 
- 
- 
+select pname from parts 
+where pid in (select pid from catalog 
+			   where sid=(select sid from suppliers where sname="Acme Widget") and pid not in (select distinct pid from catalog where sid!=(select sid from suppliers where sname="Acme Widget")));
+
+select sid
+from catalog c
+where cost > (select Avg(cost) from catalog p
+		where c.pid = p.pid
+              	group by pid);
+                
+select pid,sname from suppliers s, catalog c
+where s.sid = c.sid and s.sid in (select sid from catalog r
+				   where c.pid = r.pid and cost = (select max(cost) from catalog p
+								     where r.pid = p.pid
+								       group by pid));
 
 
+
+ 
+ 
+ 
+ 
